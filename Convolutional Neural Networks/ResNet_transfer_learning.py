@@ -1,10 +1,5 @@
-# https://deeplearningcourses.com/c/advanced-computer-vision
-# https://www.udemy.com/advanced-computer-vision
-
 from __future__ import print_function, division
 from builtins import range, input
-# Note: you may need to update your version of future
-# sudo pip install -U future
 
 from keras.layers import Input, Lambda, Dense, Flatten
 from keras.models import Model
@@ -20,8 +15,8 @@ import matplotlib.pyplot as plt
 from glob import glob
 
 
-# re-size all the images to this
-IMAGE_SIZE = [224, 224] # feel free to change depending on dataset
+# re-size all the images
+IMAGE_SIZE = [224, 224]
 
 # training config:
 epochs = 16
@@ -45,31 +40,31 @@ valid_image_files = glob(valid_path + '/*/*.jp*g')
 folders = glob(train_path + '/*')
 
 
-# look at an image for fun
+# looking at an image
 plt.imshow(image.load_img(np.random.choice(image_files)))
 plt.show()
 
 
-# add preprocessing layer to the front of VGG
+# adding preprocessing layer to the front of VGG
 res = ResNet50(input_shape=IMAGE_SIZE + [3], weights='imagenet', include_top=False)
 
-# don't train existing weights
+
 for layer in res.layers:
   layer.trainable = False
 
-# our layers - you can add more if you want
+# our layers - can add more
 x = Flatten()(res.output)
 # x = Dense(1000, activation='relu')(x)
 prediction = Dense(len(folders), activation='softmax')(x)
 
 
-# create a model object
+# creating a model object
 model = Model(inputs=res.input, outputs=prediction)
 
-# view the structure of the model
+# viewing the structure of the model
 model.summary()
 
-# tell the model what cost and optimization method to use
+
 model.compile(
   loss='categorical_crossentropy',
   optimizer='rmsprop',
@@ -78,7 +73,7 @@ model.compile(
 
 
 
-# create an instance of ImageDataGenerator
+# creating an instance of ImageDataGenerator
 gen = ImageDataGenerator(
   rotation_range=20,
   width_shift_range=0.1,
@@ -91,9 +86,8 @@ gen = ImageDataGenerator(
 )
 
 
-# test generator to see how it works and some other useful things
 
-# get label mapping for confusion matrix plot later
+# getting label mapping for confusion matrix plot later
 test_gen = gen.flow_from_directory(valid_path, target_size=IMAGE_SIZE)
 print(test_gen.class_indices)
 labels = [None] * len(test_gen.class_indices)
@@ -109,7 +103,7 @@ for x, y in test_gen:
   break
 
 
-# create generators
+# creating generators
 train_generator = gen.flow_from_directory(
   train_path,
   target_size=IMAGE_SIZE,
@@ -164,7 +158,7 @@ valid_cm = get_confusion_matrix(valid_path, len(valid_image_files))
 print(valid_cm)
 
 
-# plot some data
+# ploting
 
 # loss
 plt.plot(r.history['loss'], label='train loss')
