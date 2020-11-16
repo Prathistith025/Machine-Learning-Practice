@@ -1,9 +1,3 @@
-# https://deeplearningcourses.com/c/advanced-computer-vision
-# https://www.udemy.com/advanced-computer-vision
-
-# simple script to adapt object detection notebook from
-# https://github.com/tensorflow/models
-# to work on videos
 from __future__ import print_function, division
 from builtins import range, input
 # Note: you may need to update your version of future
@@ -19,33 +13,27 @@ from PIL import Image
 import imageio
 
 if tf.__version__ < '1.4.0':
-  raise ImportError(
-    'Please upgrade your tensorflow installation to v1.4.* or later!'
-  )
+  raise ImportError()
 
 
-# change this to wherever you cloned the tensorflow models repo
-# which I assume you've already downloaded from:
-# https://github.com/tensorflow/models
 RESEARCH_PATH = '../../tf-models/research'
 MODELS_PATH = '../../tf-models/research/object_detection'
 sys.path.append(RESEARCH_PATH)
 sys.path.append(MODELS_PATH)
 
-# import local modules
+# importing local modules
 import object_detection
 from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 
-# I've assumed you already ran the notebook and downloaded the model
 MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
 PATH_TO_CKPT = '%s/%s/frozen_inference_graph.pb' % (MODELS_PATH, MODEL_NAME)
 PATH_TO_LABELS = '%s/data/mscoco_label_map.pbtxt' % MODELS_PATH
 NUM_CLASSES = 90
 
 
-# load the model into memory
+# loading the model into memory
 detection_graph = tf.Graph()
 with detection_graph.as_default():
   od_graph_def = tf.GraphDef()
@@ -55,7 +43,7 @@ with detection_graph.as_default():
     tf.import_graph_def(od_graph_def, name='')
 
 
-# load label map
+# loading label map
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
@@ -70,7 +58,7 @@ def load_image_into_numpy_array(image):
       (im_height, im_width, 3)).astype(np.uint8)
 
 
-# do some object detection
+# doing object detection
 with detection_graph.as_default():
   with tf.Session(graph=detection_graph) as sess:
     # Definite input and output Tensors for detection_graph
@@ -83,16 +71,9 @@ with detection_graph.as_default():
     detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
     num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
-    # instead of looping through test images, we'll now loop
+    # instead of looping through test images, we can loop
     # through our video!
 
-    # get the videos from:
-    # https://lazyprogrammer.me/cnn_class2_videos.zip
-    # and put them into the same folder as this file
-
-    # open the video
-    # input_video = 'catdog'
-    # input_video = 'safari'
     input_video = 'traffic'
     video_reader = imageio.get_reader('%s.mp4' % input_video)
     video_writer = imageio.get_writer('%s_annotated.mp4' % input_video, fps=10)
@@ -123,7 +104,7 @@ with detection_graph.as_default():
           use_normalized_coordinates=True,
           line_thickness=8)
       
-      # instead of plotting image, we write the frame to video
+      # instead of plotting image, write the frame to video
       video_writer.append_data(image_np)
 
     fps = n_frames / (datetime.now() - t0).total_seconds()
