@@ -1,8 +1,5 @@
-# https://deeplearningcourses.com/c/advanced-computer-vision
 from __future__ import print_function, division
 from builtins import range, input
-# Note: you may need to update your version of future
-# sudo pip install -U future
 
 from keras.layers import Input, Lambda, Dense, Flatten, Conv2D, BatchNormalization, Activation, MaxPooling2D
 from keras.models import Model
@@ -34,14 +31,13 @@ def load_img(filepath):
 
 
 
-# look at an image for fun
+# looking at an image
 img = load_img(np.random.choice(files))
 plt.imshow(img)
 plt.show()
 
 
-# try load images as arrays
-# yes, I cheated and checked beforehand that all the images were the same shape!
+# loading images as arrays
 shape = [N] + list(img.shape)
 images = np.zeros(shape)
 for i, f in enumerate(files):
@@ -51,33 +47,29 @@ for i, f in enumerate(files):
 
 
 # make the labels
-# all the filenames are something like 'subject13.happy'
 labels = np.zeros(N)
 for i, f in enumerate(files):
   filename = f.rsplit('/', 1)[-1]
   subject_num = filename.split('.', 1)[0]
 
-  # subtract 1 since the filenames start from 1
+  # subtracting 1 since the filenames start from 1
   idx = int(subject_num.replace('subject', '')) - 1
   labels[i] = idx
 
 
-# how many of each subject do we have?
 label_count = Counter(labels)
 
 # set of unique labels
 unique_labels = set(label_count.keys())
 
-# get the number of subjects
+# getting the number of subjects
 n_subjects = len(label_count)
 
-# let's make it so 3 images for each subject are test data
-# number of test points is then
 n_test = 3 * n_subjects
 n_train = N - n_test
 
 
-# initialize arrays to hold train and test images
+# initializing arrays to hold train and test images
 train_images = np.zeros([n_train] + list(img.shape))
 train_labels = np.zeros(n_train)
 test_images = np.zeros([n_test] + list(img.shape))
@@ -92,20 +84,20 @@ for img, label in zip(images, labels):
   count_so_far[label] = count_so_far.get(label, 0) + 1
 
   if count_so_far[label] > 3:
-    # we have already added 3 test images for this subject
+    # already added 3 test images for this subject
     # so add the rest to train
     train_images[train_idx] = img
     train_labels[train_idx] = label
     train_idx += 1
 
   else:
-    # add the first 3 images to test
+    # adding the first 3 images to test
     test_images[test_idx] = img
     test_labels[test_idx] = label
     test_idx += 1
 
 
-# create label2idx mapping for easy access
+# creating label2idx mapping for easy access
 train_label2idx = {}
 test_label2idx = {}
 
@@ -122,7 +114,6 @@ for i, label in enumerate(test_labels):
     test_label2idx[label].append(i)
 
 
-# come up with all possible training sample indices
 train_positives = []
 train_negatives = []
 test_positives = []
@@ -250,16 +241,16 @@ x = Dense(units=50)(x) # feature vector
 cnn = Model(inputs=i, outputs=x)
 
 
-# feed both images into the same CNN
+# feeding both images into the same CNN
 img_placeholder1 = Input(shape=img.shape)
 img_placeholder2 = Input(shape=img.shape)
 
-# get image features
+# getting image features
 feat1 = cnn(img_placeholder1)
 feat2 = cnn(img_placeholder2)
 
 
-# calculate the Euclidean distance between feature 1 and feature 2
+# calculating the Euclidean distance between feature 1 and feature 2
 def euclidean_distance(features):
   x, y = features
   return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
@@ -269,7 +260,7 @@ def euclidean_distance(features):
 dist_layer = Lambda(euclidean_distance)([feat1, feat2])
 
 
-# the model we will actually train
+# the model will actually train
 model = Model(inputs=[img_placeholder1, img_placeholder2], outputs=dist_layer)
 
 
@@ -287,7 +278,7 @@ model.compile(
 
 
 # calculate accuracy before training
-# since the dataset is imbalanced, we'll report tp, tn, fp, fn
+# since the dataset is imbalanced, report tp, tn, fp, fn
 def get_train_accuracy(threshold=0.85):
   positive_distances = []
   negative_distances = []
@@ -305,7 +296,7 @@ def get_train_accuracy(threshold=0.85):
     print(f"pos batch: {i+1}/{n_batches}")
     pos_batch_indices = train_positives[i * batch_size: (i + 1) * batch_size]
 
-    # fill up x_batch and y_batch
+    # filling up x_batch and y_batch
     j = 0
     for idx1, idx2 in pos_batch_indices:
       x_batch_1[j] = train_images[idx1]
@@ -326,7 +317,7 @@ def get_train_accuracy(threshold=0.85):
     print(f"neg batch: {i+1}/{n_batches}")
     neg_batch_indices = train_negatives[i * batch_size: (i + 1) * batch_size]
 
-    # fill up x_batch and y_batch
+    # filling up x_batch and y_batch
     j = 0
     for idx1, idx2 in neg_batch_indices:
       x_batch_1[j] = train_images[idx1]
