@@ -1,10 +1,5 @@
-# https://deeplearningcourses.com/c/advanced-computer-vision
-# https://www.udemy.com/advanced-computer-vision
-
 from __future__ import print_function, division
 from builtins import range
-# Note: you may need to update your version of future
-# sudo pip install -U future
 
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Flatten, Dropout, BatchNormalization, Input
@@ -23,7 +18,7 @@ def y2indicator(Y):
   return I
 
 
-# get the data
+# getting the data
 # https://www.kaggle.com/zalando-research/fashionmnist
 data = pd.read_csv('../large_files/fashionmnist/fashion-mnist_train.csv')
 data = data.values
@@ -76,12 +71,11 @@ model.compile(
   metrics=['accuracy']
 )
 
-# note: multiple ways to choose a backend
+# multiple ways to choose a backend
 # either theano, tensorflow, or cntk
 # https://keras.io/backend/
 
 
-# gives us back a <keras.callbacks.History object at 0x112e61a90>
 r = model.fit(X, Y, validation_split=0.33, epochs=15, batch_size=32)
 print("Returned:", r)
 
