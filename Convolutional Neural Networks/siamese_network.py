@@ -14,7 +14,7 @@ from glob import glob
 from collections import Counter
 
 
-# get the data from: http://vision.ucsd.edu/content/yale-face-database
+# get the data from : http://vision.ucsd.edu/content/yale-face-database
 files = glob('../large_files/yalefaces/subject*')
 
 # easier to randomize later
